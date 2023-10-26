@@ -1,0 +1,20 @@
+Create a .env file and add the following
+-----------------------------------------
+
+user = 'YOUR_EMAIL_ID'
+
+pass = 'YOUR_PASSWORD'
+
+Note : Password is not your email password check this vedio
+https://youtube.com/shorts/mHGyOm_HZWg?feature=shared
+
+-----------------------------------------------------------------------
+How to Use :
+Step 1 : Add .csv file which contain list of emails
+Step 2 : Click on Upload ,The server will automatically 
+            differentiate valid and invalid email and display on website.
+Step 3 : Click on send email the server will automatically send email from 
+        your email id .
+
+Note : The text that is to be send you can add it in index.js file 
+        on line number 96. The text to be sent is not dynamic.
