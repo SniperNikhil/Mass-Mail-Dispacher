@@ -18,7 +18,7 @@ const index = path.join(__dirname, './views')
 app.set(express.static(index))
 app.get('/', async (req, res) => {
     try {
-        res.render('index', {});
+        res.render('main', {});
     } catch (error) {
         console.error(error);
         res.status(500).send('Error fetching teachers data.');
@@ -63,48 +63,56 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         });
 
         // Send the filtered email lists as the server response
-        res.render('index', {
+        res.render('main', {
             validEmails,
             invalidEmails
         })
     } catch (error) {
-        console.error('Error processing the file:', error);
         res.status(500).send('Error processing the file.');
     }
 });
 
 const nodemailer = require('nodemailer');
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.post('/sendemails', async (req, res) => {
-    // Assuming validEmails is an array of objects with the structure { email: 'email address' }
-    const validEmailsArray = req.body.validEmails;
+    try {
+        // Assuming validEmails is an array of objects with the structure { email: 'email address' }
+        const validEmailsArray = req.body.validEmails;
+        const textareaData = req.body.textareaData;
 
-    let transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.user,
-            pass: process.env.pass,
-        },
-    });
+        let transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.user,
+                pass: process.env.pass,
+            },
+        });
 
-    // Create an array of Promises to send emails
-    const emailPromises = validEmailsArray.map((email) => {
-        const mailOptions = {
-            from: 'bulkemail@gmail.com', // Replace with your Gmail email address
-            to: email,
-            subject: 'Test Email', // Replace with your email subject
-            text: 'This is a test email.', // Replace with your email content
-        };
-        return transporter.sendMail(mailOptions);
-    });
+        // Create an array of Promises to send emails
+        const emailPromises = validEmailsArray.map((email) => {
+            const mailOptions = {
+                from: 'bulkemail@gmail.com', // Replace with your Gmail email address
+                to: email,
+                subject: 'Test Email', // Replace with your email subject
+                text: textareaData, // Replace with your email content
+            };
+            return transporter.sendMail(mailOptions);
+        });
 
-    // Use Promise.all to send all emails asynchronously
-    await Promise.all(emailPromises);
+        // Use Promise.all to send all emails asynchronously
+        await Promise.all(emailPromises);
 
-    console.log(`Emails sent to all recipients.`);
-
-    res.send('Emails sent successfully.');
+        res.render("main", {
+            success: 'Emails sent successfully.'
+        })
+    } catch (error) {
+        res.status(500).send('Error processing the file Please reset and try again : '+ error);
+    }
 });
+
+app.post("/reset", async (req, res) => {
+    res.redirect("/")
+})
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
