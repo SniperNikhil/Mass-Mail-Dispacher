@@ -1,4 +1,4 @@
-Create a .env file and add the following
+In .env file and add the following
 -----------------------------------------
 
 user = 'YOUR_EMAIL_ID'
